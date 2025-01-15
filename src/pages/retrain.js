@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CloudUploadOutlined } from '@ant-design/icons';
-import { Button, message, Upload, Alert } from 'antd';
+import { Button, Upload, Alert, Modal, Result } from 'antd';
+import ExcelTemplate from './downloadExcel';
+
 const { Dragger } = Upload;
 
 const Retrain = () => {
+    const navigate = useNavigate();
     //check if file has been uploaded
     const [fileupload, setfileupload] = useState(false);
     //track alert messages error or success
     const [alert, setalert] = useState(null)
+    //open modal pop up
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // refer to antd library upload 
     const props = {
@@ -17,15 +23,13 @@ const Retrain = () => {
             const isxls = file.type === 'application/vnd.ms-excel';
             if (!(isCSV || isxlsx || isxls)) {
                 setalert(
-                <Alert
-                    description={`${file.name} is not an xlsx, xls, or csv file`}
-                    type="error"
-                    showIcon
-                    closable
-                />)
+                    <Alert
+                        description={`${file.name} is not an xlsx, xls, or csv file`}
+                        type="error"
+                        showIcon
+                    />)
                 return Upload.LIST_IGNORE;
             }
-            setalert(null);
             return true;
         },
 
@@ -38,6 +42,7 @@ const Retrain = () => {
         onChange(info) {
             const { status } = info.file;
             if (status === 'done') {
+                setalert(null);
                 setfileupload(true);
             } else if (status === 'error') {
                 setfileupload(false);
@@ -63,23 +68,16 @@ const Retrain = () => {
 
     const uploadModel = () => {
         if (fileupload) {
-            setalert(
-            <Alert
-                description= "Upload Successful, Training Model..."
-                type="success"
-                showIcon
-                closable
-            />
-            )
+            console.log('File uploaded successfully, showing modal...');
+            setIsModalOpen(true);
         }
         else {
             setalert(
                 <Alert
-                    description= "Please upload a valid file."
+                    description="Please upload a valid file."
                     type="error"
                     showIcon
-                    closable
-            />)
+                />)
         }
     }
 
@@ -87,8 +85,9 @@ const Retrain = () => {
         //display file upload UI
         <>
             <div className="card-container" style={{ padding: "40px" }}>
-                {alert} 
-                <br/>
+                {alert}
+                <ExcelTemplate />
+                <br />
                 <Dragger {...props}>
                     <p className="ant-upload-drag-icon">
                         <CloudUploadOutlined />
@@ -100,6 +99,21 @@ const Retrain = () => {
                 </Dragger>
             </div>
             <Button style={{ width: '95%' }} type="primary" onClick={uploadModel}>Train Model</Button>
+            <Modal open={isModalOpen} footer={null} closable={false}>
+                <Result
+                    status="success"
+                    title="File uploaded successfully."
+                    subTitle="Model training may take 2-5 minutes, please wait patiently."
+                    extra={[
+                        <Button type="primary" onClick={() => navigate('/models')}>
+                            View Models
+                        </Button>,
+                        <Button type="default" onClick={() => navigate('/dashboard')}>
+                            Back to Dashboard
+                        </Button>
+                    ]}
+                />
+            </Modal>
         </>
 
     );
