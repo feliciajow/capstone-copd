@@ -5,6 +5,8 @@ import About from './pages/about';
 import Dashboard from './pages/dashboard';
 import Models from './pages/Models';
 import Retrain from './pages/retrain';
+import Login from './pages/login';
+import Signup from './pages/signup';
 
 function Header() {
   const [account, setAccount] = useState(null);
@@ -20,7 +22,10 @@ function Header() {
         <button className="dashboard-btn" onClick={() => navigate('/dashboard')}>Dashboard</button>
         <button className="retrain-btn" onClick={() => navigate('/retrain')}>Retrain</button>
         <button className="models-btn" onClick={() => navigate('/models')}>Models</button>
-        <button className="login-btn" onClick={() => setAccount(account ? null : 'UserAccount')}>
+        {/* <button className="login-btn" onClick={() => setAccount(account ? null : 'UserAccount')}>
+          {account ? 'Logout' : 'Login'}
+        </button> */}
+        <button className="login-btn" onClick={() => navigate('/login')}>
           {account ? 'Logout' : 'Login'}
         </button>
       </div>
@@ -34,10 +39,12 @@ function App() {
       <div className="App">
         <Header /> {/* Include the Header component */}
         <Routes>
+          <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/about" element={<About />} />
           <Route path="/retrain" element={<Retrain />} />
           <Route path="/models" element={<Models />} />
+          <Route path="/signup" element={<Signup />} />
         </Routes>
       </div>
     </Router>
