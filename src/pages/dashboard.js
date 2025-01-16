@@ -85,8 +85,8 @@ const Dashboard=() =>{
               <option value="" disabled selected>
                 Choose codes
               </option>
-              <option value="code1">Code 1</option>
-              <option value="code2">Code 2</option>
+              <option value="code1">J44: COPD & Asthma</option>
+              <option value="code2">J51</option>
             </select>
             {errors.diagnosticCode && <p className="error-message">{errors.diagnosticCode}</p>}
     
