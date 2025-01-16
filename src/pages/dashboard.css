@@ -1,79 +1,109 @@
+/* Container Layout */
 .dashboard-container {
     display: flex;
-    flex-direction: row;
-    gap: 50px;
-    padding: 20px;
-    margin-top: 60px; 
-}
-
-.form-section {
+    justify-content: space-between;
+    align-items: flex-start; /* Align items to the top of the page */
+    gap: 10px; /* Space between form and chart sections */
+    padding: 100px;
+    font-family: Arial, sans-serif;
+    height: 50vh; /* Ensures the layout spans full height */
+  }
+  
+  /* Form Section */
+  .form-section {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-}
+    max-width: 20%; /* Restrict the form section width */
+    padding: 50px;
+  }
 
-.form-section h2 {
-    margin: 0;
-    font-size: 16px;
-}
+  h2 {
+    font-size: 14px;
+    font-weight: normal;
+    text-align: left; /* Align text to the left */
+  }
 
-.input-field {
+  .input-field {
     width: 100%;
+    height: 40px;
     padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.input-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.input-buttons {
-    display: flex;
-    flex-direction: column;
-}
-
-.input-buttons button {
-    width: 30px;
-    height: 30px;
     font-size: 16px;
-    cursor: pointer;
-}
-
-.predict-btn {
-    padding: 10px 20px;
-    background-color: #29b6f6;
-    color: white;
-    font-size: 14px;
-    border: none;
+    text-align: left;
     border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
+    border: 1px solid #ccc;
+    color: grey;
+  }
+  
+  .predict-btn {
+    font-size: 16px; 
+    font-weight: bold;
+    background-color:#29b6f6;
+    color: white;
+    margin-top: 20px;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    height: 50px;
 
-.predict-btn:hover {
-    opacity: 0.9;
-}
-
-.chart-section {
+  }
+  
+  /* Chart Section */
+  .chart-section {
     flex: 2;
     display: flex;
     flex-direction: column;
-    gap: 30px;
-}
-
-.chart-section h3 {
-    font-size: 16px;
-    margin: 0;
-}
-
-.chart {
-    height: 200px;
+    gap: 20px;
+    max-width: 70%; /* Restrict the chart section width */
+  }
+  
+  /* Adjust chart sizes */
+  .chart {
+    height: 300px; /* Increased height for better visualization */
     background-color: #f4f4f4;
     border: 1px solid #ccc;
     border-radius: 5px;
+  }
+  
+  /* Ensure buttons and inputs align properly */
+  .input-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Predict button hover effect */
+  .predict-btn:hover {
+    background-color: #0288d1;
+  }
+  
+  .form-section .input-container,
+  .form-section .input-field,
+  .form-section select {
+    width: 100%; /* Makes all elements fill the parent container */
+    max-width: 400px; 
+    height: 60px; /* Standardize height */
+    box-sizing: border-box; /* Ensure padding and border are included in the width/height */
 }
+
+/* Error Message Styling */
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+    margin-bottom: 20px; /* Adjust spacing between input and error message */
+    text-align: left;
+  }
+
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .dashboard-container {
+      flex-direction: column; /* Stack sections on small screens */
+    }
+  
+    .form-section,
+    .chart-section {
+      max-width: 100%;
+    }
+  }
+  
