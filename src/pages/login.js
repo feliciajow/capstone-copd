@@ -101,7 +101,7 @@ const Login = () => {
           </Row>
           <Row>
             <Col span={24}>
-              <Button className="login-btns" type="primary" htmlType="submit">
+              <Button className="login-btns" type="primary" style={{ width: "100%", marginTop: "10px", backgroundColor: "#29b6f6" }} htmlType="submit">
                 Login
               </Button>
             </Col>

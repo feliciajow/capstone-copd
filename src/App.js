@@ -15,7 +15,7 @@ function Header() {
   return (
     <div className="navbar">
       <div className="navbar-left">
-        <div className="navbar-title">BREATHAI</div>
+        <div className="navbar-title" onClick={() => navigate('/about')}>BREATHAI</div>
       </div>
       <div className="navbar-right">
         <button className="about-btn" onClick={() => navigate('/about')}>About</button>

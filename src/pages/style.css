@@ -4,7 +4,7 @@
     margin-top: 10px
 }
 .login-btns{
-    background-color: #27a3dc;
+    background-color: #29b6f6;
 }
 
 .login-container, .signup-container{
@@ -27,9 +27,8 @@
     margin-top: 30px;
 }
 
-.btns:hover, .forgotpwd-btns:hover {
+.btns:hover, .forgotpwd-btns:hover, .register-btns:hover, .login-btns:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    background-color: #27a3dc;
 }
 
 .card-container {

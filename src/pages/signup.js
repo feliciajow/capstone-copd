@@ -54,7 +54,7 @@ const Signup = () => {
           ]}
           hasFeedback
         >
-          <Input />
+          <Input placeholder='Enter your email'/>
         </Form.Item>
 
         <Form.Item style={{ textAlign: "left" }}
@@ -74,7 +74,7 @@ const Signup = () => {
           ]}
           hasFeedback
         >
-          <Input.Password />
+          <Input.Password placeholder='Enter your password'/>
         </Form.Item>
 
         <Form.Item style={{ textAlign: "left" }}
@@ -90,21 +90,24 @@ const Signup = () => {
             },
             ({ getFieldValue }) => ({
               validator(_, value) {
-                if (!value || getFieldValue('password') === value) {
+                if (!value){
                   return Promise.resolve();
                 }
-                return Promise.reject(new Error('The new password that you entered do not match!'));
+                if (value !== getFieldValue('password')){
+                  return Promise.reject(new Error('Confirm password entered do not match!'));
+                }
+                return Promise.resolve();
               },
             }),
           ]}
         >
-          <Input.Password />
+          <Input.Password placeholder='Enter your confirm password'/>
         </Form.Item>
 
         <Form.Item label={null}>
           <Row>
             <Col span={24}>
-              <Button type="primary" style={{ width: "100%", marginTop: "10px", backgroundColor: "#29b6f6" }} htmlType="submit">
+              <Button className="register-btns" type="primary" style={{ width: "100%", marginTop: "10px", backgroundColor: "#29b6f6" }} htmlType="submit">
                 Register
               </Button>
             </Col>
