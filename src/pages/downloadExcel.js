@@ -12,8 +12,8 @@ const ExcelTemplate=() =>{
         excel.writeFile(workbook,"training.xlsx")
     }
     return(
-        <div className="card-container" style={{textAlign: 'left' }}>
-            <h4>Download template file:</h4>
+        <div className="card" style={{textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <p>Download template file:</p>
             <Button type="default" icon={<DownloadOutlined />} onClick={downloadExcel}>
                 COPD Asthma Excel Template
             </Button>
