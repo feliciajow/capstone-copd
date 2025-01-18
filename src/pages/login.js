@@ -97,6 +97,7 @@ const Login = () => {
               <Flex justify="space-between" align="left">
                 <a href='#' onClick={openModal}>Forgot password</a>
               </Flex>
+              <a href='/about'> Continue as guest</a>
             </Col>
           </Row>
           <Row>

@@ -1,19 +1,46 @@
-import React from 'react';
-import { Button, Row, Col, Form, Input, Flex } from 'antd';
+import React, { useState } from 'react';
+import { Button, Row, Col, Form, Input, Alert } from 'antd';
 import './style.css';
 import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   const navigate = useNavigate();
+  //track alert messages error
+  const [alert, setalert] = useState(null)
+
   const onFinish = (values) => {
-    console.log('Success:', values);
-    navigate('/login')
+    fetch('http://localhost:5000/register', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" }, //telling server the type of content that we are sending with this req
+      body: JSON.stringify({email: values.email, password: values.password}), //actual content email and password
+    })
+    
+    .then((response)=>{ //if status is 409 means there is duplicate value in the columns (email) then error message
+      if (!response.ok){
+        return response.json().then((data)=>{
+          throw new Error(data.error || 'Registration failed');
+        });
+      }
+      return response.json();
+    })
+    
+    .then(()=>{
+      console.log('Success:', values);
+      navigate('/login')
+    })
+    .catch(()=>{
+      setalert(
+        <Alert
+            description='There is an existing account with this email.'
+            type="error"
+            showIcon
+      />)
+    })
   };
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
+
   return (
     <div className="signup-container" style={{ padding: "60px" }}>
+      {alert}
       <Row>
         <h1>Sign up</h1>
       </Row>
@@ -35,7 +62,6 @@ const Signup = () => {
           remember: true,
         }}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
         autoComplete="on"
       >
         <Form.Item style={{ textAlign: "left" }}

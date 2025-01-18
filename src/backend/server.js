@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+const { Client } = require('pg')
 const express = require("express");
 const app = express();
 const port = 5000;
@@ -7,10 +9,42 @@ app.use(
     origin: "http://localhost:3000",
   })
 );
+app.use(express.json());
+
+//connect to db
+const client = new Client({
+  host: "localhost",
+  user: "postgres",
+  port: 5432,
+  password: "cghrespi",
+  database: "cghdb"
+})
+client.connect();
 
 app.get("/", (req, res) => {
   res.send("Received!");
 });
+
+app.post('/register', async(req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required.' });
+  }
+  try{
+    const hashpwd = bcrypt.hashSync(password, 10)
+    //save to DB
+    const result = await client.query('INSERT INTO users (email,hashpassword) VALUES ($1,$2)', [email,hashpwd]);
+    res.status(201).json({ message: 'User registered successfully.'});
+  }catch (error) {
+    if (error.code === '23505'){
+      return res.status(409).json({ error: 'There is an existing account with this email.' });
+    }
+    else{
+      return res.status(500).json({ error: 'Error has occured.' });
+    }
+  }
+})
+
 app.post("/fileUpload", (req, res) => {
   res.sendStatus(200);
 });
