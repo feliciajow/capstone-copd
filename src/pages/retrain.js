@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CloudUploadOutlined } from '@ant-design/icons';
+import { CloudUploadOutlined, DownloadOutlined } from '@ant-design/icons';
 import { Button, Upload, Alert, Modal, Result } from 'antd';
 import ExcelTemplate from './downloadExcel';
 import './style.css';
@@ -54,9 +54,14 @@ const Retrain = () => {
         onDrop(e) {
             console.log('Dropped files', e.dataTransfer.files);
         },
-
         //display file size
         showUploadList: {
+            showDownloadIcon: true,
+            downloadIcon: (file) => (
+                <a href={file.url || URL.createObjectURL(file.originFileObj)} download={file.name}>
+                  <DownloadOutlined />
+                </a>
+            ),
             extra: ({ size = 0 }) => (
                 <span
                     style={{
@@ -147,7 +152,6 @@ const Retrain = () => {
 
     );
 };
-
 
 export default Retrain;
 

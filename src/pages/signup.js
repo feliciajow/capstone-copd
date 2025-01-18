@@ -1,19 +1,46 @@
-import React from 'react';
-import { Button, Row, Col, Form, Input, Flex } from 'antd';
+import React, { useState } from 'react';
+import { Button, Row, Col, Form, Input, Alert } from 'antd';
 import './style.css';
 import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   const navigate = useNavigate();
+  //track alert messages error
+  const [alert, setalert] = useState(null)
+
   const onFinish = (values) => {
-    console.log('Success:', values);
-    navigate('/login')
+    fetch('http://localhost:5000/register', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" }, //telling server the type of content that we are sending with this req
+      body: JSON.stringify({email: values.email, password: values.password}), //actual content email and password
+    })
+    
+    .then((response)=>{ //if status is 409 means there is duplicate value in the columns (email) then error message
+      if (!response.ok){
+        return response.json().then((data)=>{
+          throw new Error(data.error || 'Registration failed');
+        });
+      }
+      return response.json();
+    })
+    
+    .then(()=>{
+      console.log('Success:', values);
+      navigate('/login')
+    })
+    .catch((error)=>{ //handle errors from fetch response
+      setalert(
+        <Alert
+            description={error.message}
+            type="error"
+            showIcon
+      />)
+    })
   };
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
+
   return (
     <div className="signup-container" style={{ padding: "60px" }}>
+      {alert}
       <Row>
         <h1>Sign up</h1>
       </Row>
@@ -35,7 +62,6 @@ const Signup = () => {
           remember: true,
         }}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
         autoComplete="on"
       >
         <Form.Item style={{ textAlign: "left" }}
@@ -54,7 +80,7 @@ const Signup = () => {
           ]}
           hasFeedback
         >
-          <Input />
+          <Input placeholder='Enter your email'/>
         </Form.Item>
 
         <Form.Item style={{ textAlign: "left" }}
@@ -74,7 +100,7 @@ const Signup = () => {
           ]}
           hasFeedback
         >
-          <Input.Password />
+          <Input.Password placeholder='Enter your password'/>
         </Form.Item>
 
         <Form.Item style={{ textAlign: "left" }}
@@ -90,21 +116,24 @@ const Signup = () => {
             },
             ({ getFieldValue }) => ({
               validator(_, value) {
-                if (!value || getFieldValue('password') === value) {
+                if (!value){
                   return Promise.resolve();
                 }
-                return Promise.reject(new Error('The new password that you entered do not match!'));
+                if (value !== getFieldValue('password')){
+                  return Promise.reject(new Error('Confirm password entered do not match!'));
+                }
+                return Promise.resolve();
               },
             }),
           ]}
         >
-          <Input.Password />
+          <Input.Password placeholder='Enter your confirm password'/>
         </Form.Item>
 
         <Form.Item label={null}>
           <Row>
             <Col span={24}>
-              <Button type="primary" style={{ width: "100%", marginTop: "10px", backgroundColor: "#29b6f6" }} htmlType="submit">
+              <Button className="register-btns" type="primary" style={{ width: "100%", marginTop: "10px", backgroundColor: "#29b6f6" }} htmlType="submit">
                 Register
               </Button>
             </Col>

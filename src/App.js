@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import About from './pages/about';
 import Dashboard from './pages/dashboard';
@@ -11,22 +11,22 @@ import Signup from './pages/signup';
 function Header() {
   const [account, setAccount] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const email = location.state?.email;
 
   return (
     <div className="navbar">
       <div className="navbar-left">
-        <div className="navbar-title">BREATHAI</div>
+        <div className="navbar-title" onClick={() => navigate('/about')}>BREATHAI</div>
       </div>
       <div className="navbar-right">
         <button className="about-btn" onClick={() => navigate('/about')}>About</button>
         <button className="dashboard-btn" onClick={() => navigate('/dashboard')}>Dashboard</button>
         <button className="retrain-btn" onClick={() => navigate('/retrain')}>Retrain</button>
         <button className="models-btn" onClick={() => navigate('/models')}>Models</button>
-        {/* <button className="login-btn" onClick={() => setAccount(account ? null : 'UserAccount')}>
-          {account ? 'Logout' : 'Login'}
-        </button> */}
+        {email}
         <button className="login-btn" onClick={() => navigate('/login')}>
-          {account ? 'Logout' : 'Login'}
+          {email ? 'Logout' : 'Login'}
         </button>
       </div>
     </div>
