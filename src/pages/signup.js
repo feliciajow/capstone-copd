@@ -28,10 +28,10 @@ const Signup = () => {
       console.log('Success:', values);
       navigate('/login')
     })
-    .catch(()=>{
+    .catch((error)=>{ //handle errors from fetch response
       setalert(
         <Alert
-            description='There is an existing account with this email.'
+            description={error.message}
             type="error"
             showIcon
       />)

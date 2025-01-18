@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Row, Col, Form, Input, Flex, Modal, Result } from 'antd';
+import { Button, Row, Col, Form, Input, Flex, Modal, Result, Alert } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import './style.css';
 import Dashboard from './dashboard';
@@ -8,6 +8,9 @@ const Login = () => {
   const navigate = useNavigate();
   //open modal pop up
   const [isModalOpen, setIsModalOpen] = useState(false);
+  //track alert messages error
+  const [alert, setalert] = useState(null)
+
   const openModal = () => {
     setIsModalOpen(true)
   }
@@ -19,15 +22,40 @@ const Login = () => {
   }
   //submit buttons
   const onFinish = (values) => {
-    console.log('Success:', values);
-    navigate('/dashboard');
+    fetch('http://localhost:5000/loggedin', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" }, //telling server the type of content that we are sending with this req
+      body: JSON.stringify({email: values.email, password: values.password}), //actual content email and password
+    })
+    .then((response)=>{ //if status is 409 means there is duplicate value in the columns (email) then error message
+      if (!response.ok){
+        return response.json().then((data)=>{
+          throw new Error(data.error || 'Login failed');
+        });
+      }
+      return response.json();
+    })
+    .then(()=>{
+      console.log('Success:', values);
+      navigate('/dashboard', { state: {email: values.email} });
+    })
+    .catch((error)=>{ //handle errors from fetch response
+      setalert(
+        <Alert
+            description={error.message}
+            type="error"
+            showIcon
+      />)
+    })
   };
+
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
 
   return (
     <div className="login-container" style={{ padding: "60px" }}>
+      {alert}
       <Row>
         <h1>Login</h1>
       </Row>
