@@ -7,7 +7,7 @@ import './style.css';
 
 const { Dragger } = Upload;
 
-const Retrain = () => {
+const Retrain = ({ email }) => {
     const navigate = useNavigate();
     //check if file has been uploaded
     const [fileupload, setfileupload] = useState(false);
@@ -54,12 +54,13 @@ const Retrain = () => {
         onDrop(e) {
             console.log('Dropped files', e.dataTransfer.files);
         },
+
         //display file size
         showUploadList: {
             showDownloadIcon: true,
             downloadIcon: (file) => (
                 <a href={file.url || URL.createObjectURL(file.originFileObj)} download={file.name}>
-                  <DownloadOutlined />
+                    <DownloadOutlined />
                 </a>
             ),
             extra: ({ size = 0 }) => (
@@ -101,6 +102,13 @@ const Retrain = () => {
         <>
             <div className="container">
                 {alert}
+                {!email && (
+                    <Alert
+                        description="You have to login to your account to train your file."
+                        type="info"
+                        showIcon
+                    />
+                )}
                 <h1 className='title'>Upload File</h1>
 
                 <div className="card-container">

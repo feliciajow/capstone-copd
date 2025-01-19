@@ -8,11 +8,8 @@ import Retrain from './pages/retrain';
 import Login from './pages/login';
 import Signup from './pages/signup';
 
-function Header() {
-  const [account, setAccount] = useState(null);
+function Header({email, handleLogin}) {
   const navigate = useNavigate();
-  const location = useLocation();
-  const email = location.state?.email;
 
   return (
     <div className="navbar">
@@ -24,8 +21,12 @@ function Header() {
         <button className="dashboard-btn" onClick={() => navigate('/dashboard')}>Dashboard</button>
         <button className="retrain-btn" onClick={() => navigate('/retrain')}>Retrain</button>
         <button className="models-btn" onClick={() => navigate('/models')}>Models</button>
-        {email}
-        <button className="login-btn" onClick={() => navigate('/login')}>
+        {email} 
+        <button className="login-btn" onClick={() => {
+          if (email){
+            handleLogin(null);
+          } navigate('/login'); //if no email then logout and navigate to login page
+        }}>
           {email ? 'Logout' : 'Login'}
         </button>
       </div>
@@ -34,16 +35,20 @@ function Header() {
 }
 
 function App() {
+  const [email, setEmail] = useState(null);
+  const handleLogin = (useremail) => {
+    setEmail(useremail);
+  };
   return (
     <Router>
       <div className="App">
-        <Header /> {/* Include the Header component */}
+        <Header email={email} handleLogin={handleLogin}/> {/* Include the Header component */}
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login handleLogin={handleLogin}/>} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/about" element={<About />} />
-          <Route path="/retrain" element={<Retrain />} />
-          <Route path="/models" element={<Models />} />
+          <Route path="/retrain" element={<Retrain email={email}/>} />
+          <Route path="/models" element={<Models email={email}/>} />
           <Route path="/signup" element={<Signup />} />
         </Routes>
       </div>
