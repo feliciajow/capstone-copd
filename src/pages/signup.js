@@ -1,107 +1,154 @@
-import React from 'react';
-import { Button, Row, Col, Form, Input, Flex } from 'antd';
+import React, { useState } from 'react';
+import { Button, Row, Col, Form, Input, Alert } from 'antd';
+import './style.css';
+import { useNavigate } from 'react-router-dom';
 
-const onFinish = (values) => {
-  console.log('Success:', values);
-};
-const onFinishFailed = (errorInfo) => {
-  console.log('Failed:', errorInfo);
-};
+const Signup = () => {
+  const navigate = useNavigate();
+  //track alert messages error
+  const [alert, setalert] = useState(null)
 
-const Signup = () => (
-  <div className="card-container" style={{ padding: "60px" }}>
-    <Row>
-      <Col span={2}>
+  const onFinish = (values) => {
+    fetch('http://localhost:5000/register', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" }, //telling server the type of content that we are sending with this req
+      body: JSON.stringify({email: values.email, password: values.password}), //actual content email and password
+    })
+    
+    .then((response)=>{ //if status is 409 means there is duplicate value in the columns (email) then error message
+      if (!response.ok){
+        return response.json().then((data)=>{
+          throw new Error(data.error || 'Registration failed');
+        });
+      }
+      return response.json();
+    })
+    
+    .then(()=>{
+      console.log('Success:', values);
+      navigate('/login')
+    })
+    .catch((error)=>{ //handle errors from fetch response
+      setalert(
+        <Alert
+            description={error.message}
+            type="error"
+            showIcon
+      />)
+    })
+  };
+
+  return (
+    <div className="signup-container" style={{ padding: "60px" }}>
+      {alert}
+      <Row>
         <h1>Sign up</h1>
-      </Col>
-    </Row>
-    <Form
-      name="basic"
-      //positioning of input box
-      labelCol={{
-        span: 6,
-      }}
-      //length of input box
-      wrapperCol={{
-        span: 18,
-      }}
-      style={{
-        maxWidth: 600,
-      }}
-      initialValues={{
-        remember: true,
-      }}
-      onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
-      autoComplete="on"
-    >
-      <Form.Item style={{ textAlign: "left" }}
-        name="email"
-        label="Email"
-        rules={[
-          {
-            type: 'email',
-            message: 'Please enter a valid email!',
-          },
-          {
-            required: true,
-            message: 'Please input your email!',
-          },
-        ]}
-        hasFeedback
+      </Row>
+      <br />
+      <Form
+        name="basic"
+        //positioning of input box
+        labelCol={{
+          span: 6,
+        }}
+        //length of input box
+        wrapperCol={{
+          span: 18,
+        }}
+        style={{
+          maxWidth: 600,
+        }}
+        initialValues={{
+          remember: true,
+        }}
+        onFinish={onFinish}
+        autoComplete="on"
       >
-        <Input />
-      </Form.Item>
-
-      <Form.Item style={{ textAlign: "left" }}
-        label="Password"
-        name="password"
-        rules={[
-          {
-            required: true,
-            message: 'Please input your password!',
-          },
-        ]}
-        hasFeedback
-      >
-        <Input.Password />
-      </Form.Item>
-
-      <Form.Item style={{ textAlign: "left" }}
-        name="confirm"
-        label="Confirm Password"
-        dependencies={['password']}
-        hasFeedback
-        rules={[
-          {
-            required: true,
-            message: 'Please confirm your password!',
-          },
-          ({ getFieldValue }) => ({
-            validator(_, value) {
-              if (!value || getFieldValue('password') === value) {
-                return Promise.resolve();
-              }
-              return Promise.reject(new Error('The new password that you entered do not match!'));
+        <Form.Item style={{ textAlign: "left" }}
+          name="email"
+          label="Email"
+          labelAlign="left"
+          rules={[
+            {
+              type: 'email',
+              message: 'Please enter a valid email!',
             },
-          }),
-        ]}
-      >
-        <Input.Password />
-      </Form.Item>
+            {
+              required: true,
+              message: 'Please input your email!',
+            },
+          ]}
+          hasFeedback
+        >
+          <Input placeholder='Enter your email'/>
+        </Form.Item>
 
-      <Form.Item label={null}>
-        <Row>
-          <Col span={4}>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Col>
-          <Col span={14}></Col>
-        </Row>
-      </Form.Item>
-    </Form>
-  </div>
-);
+        <Form.Item style={{ textAlign: "left" }}
+          label="Password"
+          labelAlign="left"
+          name="password"
+          rules={[
+            {
+              required: true,
+              message: 'Please input your password!',
+            },
+            {
+              //password minimum 8 characters
+              min: 8,
+              message: 'Passwords must be at least 8 characters long.'
+            }
+          ]}
+          hasFeedback
+        >
+          <Input.Password placeholder='Enter your password'/>
+        </Form.Item>
+
+        <Form.Item style={{ textAlign: "left" }}
+          name="confirm"
+          label="Confirm Password"
+          labelAlign="left"
+          dependencies={['password']}
+          hasFeedback
+          rules={[
+            {
+              required: true,
+              message: 'Please confirm your password!',
+            },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (!value){
+                  return Promise.resolve();
+                }
+                if (value !== getFieldValue('password')){
+                  return Promise.reject(new Error('Confirm password entered do not match!'));
+                }
+                return Promise.resolve();
+              },
+            }),
+          ]}
+        >
+          <Input.Password placeholder='Enter your confirm password'/>
+        </Form.Item>
+
+        <Form.Item label={null}>
+          <Row>
+            <Col span={24}>
+              <Button className="register-btns" type="primary" style={{ width: "100%", marginTop: "10px", backgroundColor: "#29b6f6" }} htmlType="submit">
+                Register
+              </Button>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={24}>
+              <Button type="default" style={{ width: "100%", marginTop: "10px" }} onClick={() => navigate('/login')}>
+                Back to Login
+              </Button>
+            </Col>
+          </Row>
+        </Form.Item>
+      </Form>
+    </div>
+  )
+};
 
 export default Signup;

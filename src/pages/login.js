@@ -1,23 +1,66 @@
-import React from 'react';
-import { Button, Row, Col, Form, Input, Flex } from 'antd';
+import React, { useState } from 'react';
+import { Button, Row, Col, Form, Input, Flex, Modal, Result, Alert } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import './style.css';
+import Dashboard from './dashboard';
 
-const onFinish = (values) => {
-  console.log('Success:', values);
-};
-const onFinishFailed = (errorInfo) => {
-  console.log('Failed:', errorInfo);
-};
-
-const Login = () => {
+const Login = ({ handleLogin }) => {
   const navigate = useNavigate();
+  //open modal pop up
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  //track alert messages error
+  const [alert, setalert] = useState(null)
+
+  const openModal = () => {
+    setIsModalOpen(true)
+  }
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+  const handleConfirm = () => {
+    setIsModalOpen(true);
+  }
+  //submit buttons
+  const onFinish = (values) => {
+    fetch('http://localhost:5000/loggedin', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" }, //telling server the type of content that we are sending with this req
+      body: JSON.stringify({email: values.email, password: values.password}), //actual content email and password
+    })
+    .then((response)=>{ //if status is 409 means there is duplicate value in the columns (email) then error message
+      if (!response.ok){
+        return response.json().then((data)=>{
+          throw new Error(data.error || 'Login failed');
+        });
+      }
+      return response.json();
+    })
+    .then(()=>{
+      console.log('Success:', values);
+      handleLogin(values.email);
+      navigate('/dashboard', { state: {email: values.email} });
+    })
+    .catch((error)=>{ //handle errors from fetch response
+      setalert(
+        <Alert
+            description={error.message}
+            type="error"
+            showIcon
+      />)
+    })
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+  };
+
   return (
-    <div className="card-container" style={{ padding: "60px" }}>
+    <div className="login-container" style={{ padding: "60px" }}>
+      {alert}
       <Row>
-        <Col span={2}>
-          <h1>Login</h1>
-        </Col>
+        <h1>Login</h1>
       </Row>
+      <br />
       <Form
         name="basic"
         //positioning of input box
@@ -41,6 +84,7 @@ const Login = () => {
         <Form.Item style={{ textAlign: "left" }}
           name="email"
           label="Email"
+          labelAlign="left"
           rules={[
             {
               type: 'email',
@@ -53,48 +97,89 @@ const Login = () => {
           ]}
           hasFeedback
         >
-          <Input />
+          <Input placeholder='Enter your email' />
         </Form.Item>
 
         <Form.Item style={{ textAlign: "left" }}
           label="Password"
+          labelAlign="left"
           name="password"
           rules={[
             {
               required: true,
               message: 'Please input your password!',
             },
+            {
+              //password minimum 8 characters
+              min: 8 ,
+              message: 'Passwords must be at least 8 characters long.'
+            }
           ]}
           hasFeedback
         >
-          <Input.Password />
+          <Input.Password placeholder='Enter your password' />
         </Form.Item>
 
         <Form.Item label={null}>
           <Row>
             <Col span={6}>
               <Flex justify="space-between" align="left">
-                <a href="">Forgot password</a>
+                <a href='#' onClick={openModal}>Forgot password</a>
               </Flex>
+              <a href='/about'> Continue as guest</a>
             </Col>
           </Row>
           <Row>
             <Col span={24}>
-                <Button style={{width:"100%", marginTop:"10px", backgroundColor:"#29b6f6"}} type="primary" htmlType="submit">
-                  <b>Submit</b>
-                </Button>
+              <Button className="login-btns" type="primary" style={{ width: "100%", marginTop: "10px", backgroundColor: "#29b6f6" }} htmlType="submit">
+                Login
+              </Button>
             </Col>
           </Row>
           <Row>
             <Col span={24}>
-              <Button style={{width:"100%", marginTop:"10px", backgroundColor:"#29b6f6"}} type="primary" onClick={() => navigate('/signup')}>
-                <b>Register</b>
+              <Button className="register-btns" type="default" onClick={() => navigate('/signup')}>
+                Register
               </Button>
             </Col>
           </Row>
         </Form.Item>
       </Form>
+      <Modal open={isModalOpen} footer={null} closable={false}>
+        <Result
+          title="Forgot Password"
+          extra={[
+            <Form>
+              <Form.Item style={{ textAlign: "left" }}
+                name="email"
+                label="Email"
+                labelAlign="left"
+                rules={[
+                  {
+                    type: 'email',
+                    message: 'Please enter a valid email!',
+                  },
+                  {
+                    required: true,
+                    message: 'Please input your email!',
+                  },
+                ]}
+                hasFeedback
+              >
+                <Input placeholder="Enter your email" />
+              </Form.Item>
+              <Form.Item>
+                <Button className="forgotpwd-btns" type="default" htmlType="submit">
+                  Next
+                </Button>
+              </Form.Item>
+            </Form>
+
+          ]}
+        />
+      </Modal>
     </div>
+
   );
 };
 

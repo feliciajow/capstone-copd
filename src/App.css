@@ -1,7 +1,9 @@
 .App {
   text-align: center;
 }
-
+body{
+  background: linear-gradient(120deg, #f7faff, #eaf0f5);
+}
 /* .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -80,7 +82,8 @@
   cursor: pointer;
   transition: background 0.3s ease;
   white-space: nowrap;
-  background-color:#29b6f6
+  background-color:#29b6f6;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 .login-btn:hover {
   opacity: 0.9; /* Subtle hover effect */
