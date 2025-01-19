@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './dashboard.css';
 
-
 const Dashboard=() =>{
     const navigate = useNavigate();
     const [gender, setGender] = useState('');
@@ -35,23 +34,53 @@ const Dashboard=() =>{
     };
 
     return (
-        <div className="dashboard-container">
-          {/* Form Section */}
-          <div className="form-section">
-            <h2>Gender</h2>
-            <select 
-              className="input-field"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}>
-              <option value="" disabled selected>
-                Select a gender
-              </option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-            </select>
-            {errors.gender && <p className="error-message">{errors.gender}</p>}
+          <div className="dashboard-container">
+          <div className="results-container">
+          <div className="results-group estimated-survival">
+            <h3>Estimated Survival</h3>
+            <div className="metric-cards">
+            <div className="probability">
+              <h3>6 month</h3>
+              <p>0.961</p>
+            </div>
+            <div className="probability">
+              <h3>12 month</h3>
+              <p>0.961</p>
+            </div>
+          </div>
+          </div>
 
-    
+        <div className="results-group estimated-readmission">
+          <h3>Estimated Readmission</h3>
+          <div className="metric-cards">
+          <div className="probability">
+            <h3>1 year</h3>
+            <p>0.928</p>
+          </div>
+          <div className="probability">
+            <h3>5 year</h3>
+            <p>0.97</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        {/* Form Section */}
+        <div className="main-content">
+        <div className="form-section">
+          <h2>Gender</h2>
+          <select 
+            className="input-field"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}>
+            <option value="" disabled selected>
+              Select a gender
+            </option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+          {errors.gender && <p className="error-message">{errors.gender}</p>}
+
             <h2>Age</h2>
             <div className="input-container">
               <input
@@ -76,7 +105,6 @@ const Dashboard=() =>{
           </div>
           {errors.timesAdmitted && <p className="error-message">{errors.timesAdmitted}</p>}
 
-    
             <h2>Diagnostic Codes</h2>
             <select 
               className="input-field"
@@ -105,6 +133,7 @@ const Dashboard=() =>{
               <div className="chart"></div>
             </div>
           </div>
+        </div>
         </div>
       );
     };
