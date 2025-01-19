@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import './style.css';
 import Dashboard from './dashboard';
 
-const Login = () => {
+const Login = ({ handleLogin }) => {
   const navigate = useNavigate();
   //open modal pop up
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,6 +37,7 @@ const Login = () => {
     })
     .then(()=>{
       console.log('Success:', values);
+      handleLogin(values.email);
       navigate('/dashboard', { state: {email: values.email} });
     })
     .catch((error)=>{ //handle errors from fetch response

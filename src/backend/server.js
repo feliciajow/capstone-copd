@@ -76,6 +76,28 @@ app.post("/fileUpload", (req, res) => {
   res.sendStatus(200);
 });
 
+app.get("/model", async(req, res) => {
+  const {email} = req.headers; //retrieve email from header in frontend
+  if (!email){
+    return res.status(400).json({ error: 'Email is required.' });
+  }
+  try{
+    const result = await client.query(
+      `Select m.modelid, m.true_positive, m.false_positive, m.true_negative, m.false_negative, m.timestamp 
+      From models m 
+      Inner join users u 
+      On m.userid=u.userid 
+      Where u.email=$1`,[email]
+    );
+    if (result.rows.length === 0){
+      return res.status(404).json({error: 'No models trained.'});
+    }
+    return res.status(200).json(result.rows);
+  }catch (error){
+    return res.status(500).json({ error: 'An error has occured.' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`BREATHAI listening on port ${port}`);
 });
