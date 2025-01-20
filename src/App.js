@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
 import About from './pages/about';
 import Dashboard from './pages/dashboard';
@@ -25,7 +25,7 @@ function Header({email, handleLogin}) {
         <button className="login-btn" onClick={() => {
           if (email){
             handleLogin(null);
-          } navigate('/login'); //if no email then logout and navigate to login page
+          } navigate('/'); //if no email then logout and navigate to login page
         }}>
           {email ? 'Logout' : 'Login'}
         </button>
@@ -36,15 +36,29 @@ function Header({email, handleLogin}) {
 
 function App() {
   const [email, setEmail] = useState(null);
+  //everytime website refresh retrieve email 
+  useEffect(()=>{
+    const storedEmail = localStorage.getItem('email')
+    if (storedEmail){
+      setEmail(storedEmail);
+    }
+  },[]);
+
   const handleLogin = (useremail) => {
     setEmail(useremail);
+    if (useremail){
+      localStorage.setItem('email', useremail);
+    } else{
+      localStorage.removeItem('email');
+    }
   };
+
   return (
     <Router>
       <div className="App">
         <Header email={email} handleLogin={handleLogin}/> {/* Include the Header component */}
         <Routes>
-          <Route path="/login" element={<Login handleLogin={handleLogin}/>} />
+          <Route path="/" element={<Login handleLogin={handleLogin}/>} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/about" element={<About />} />
           <Route path="/retrain" element={<Retrain email={email}/>} />

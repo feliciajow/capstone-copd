@@ -26,7 +26,7 @@ const Signup = () => {
     
     .then(()=>{
       console.log('Success:', values);
-      navigate('/login')
+      navigate('/')
     })
     .catch((error)=>{ //handle errors from fetch response
       setalert(
@@ -140,7 +140,7 @@ const Signup = () => {
           </Row>
           <Row>
             <Col span={24}>
-              <Button type="default" style={{ width: "100%", marginTop: "10px" }} onClick={() => navigate('/login')}>
+              <Button type="default" style={{ width: "100%", marginTop: "10px" }} onClick={() => navigate('/')}>
                 Back to Login
               </Button>
             </Col>
