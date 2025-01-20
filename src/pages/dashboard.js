@@ -1,65 +1,141 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import './dashboard.css';
 
 const Dashboard=() =>{
     const navigate = useNavigate();
+    const [gender, setGender] = useState('');
+    const [age, setAge] = useState('');
+    const [timesAdmitted, setTimesAdmitted] = useState('');
+    const [diagnosticCode, setDiagnosticCode] = useState('');
+    const [errors, setErrors] = useState({});
 
+    // Handle form submission
+    const handlePredict = () => {
+    let validationErrors = {};
+
+    // Check if each field is filled
+    if (!gender || gender === '') validationErrors.gender = '*Gender is required';
+    if (!age|| age==='0') validationErrors.age = '*Age is required';
+    if (!timesAdmitted) validationErrors.timesAdmitted = '*Number of times admitted is required';
+    if (!diagnosticCode || diagnosticCode === '') validationErrors.diagnosticCode = '*Diagnostic code is required';
+
+    setErrors(validationErrors);
+
+    // If no errors, proceed with prediction logic
+    if (Object.keys(validationErrors).length === 0) {
+      // Call prediction logic here
+      console.log('Prediction logic here');
+    }
+  };
+    
     const handleCollection = () => {
-        navigate('/collection');
-      };
+      navigate('/collection');
+    };
 
     return (
-      <div className="dashboard-container">
+          <div className="dashboard-container">
+          <div className="results-container">
+          <div className="results-group estimated-survival">
+            <h3>Estimated Survival</h3>
+            <div className="metric-cards">
+            <div className="probability">
+              <h3>6 month</h3>
+              <p>0.961</p>
+            </div>
+            <div className="probability">
+              <h3>12 month</h3>
+              <p>0.961</p>
+            </div>
+          </div>
+          </div>
+
+        <div className="results-group estimated-readmission">
+          <h3>Estimated Readmission</h3>
+          <div className="metric-cards">
+          <div className="probability">
+            <h3>1 year</h3>
+            <p>0.928</p>
+          </div>
+          <div className="probability">
+            <h3>5 year</h3>
+            <p>0.97</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        {/* Form Section */}
+        <div className="main-content">
         <div className="form-section">
           <h2>Gender</h2>
-          <select className="input-field">
+          <select 
+            className="input-field"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}>
             <option value="" disabled selected>
               Select a gender
             </option>
             <option value="male">Male</option>
             <option value="female">Female</option>
           </select>
-  
-          <h2>Age</h2>
-          <div className="input-container">
-            <input className="input-field" type="number" placeholder="Enter age" />
+          {errors.gender && <p className="error-message">{errors.gender}</p>}
+
+            <h2>Age</h2>
+            <div className="input-container">
+              <input
+                className="input-field"
+                type="number"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                placeholder="Enter age"
+              />
           </div>
-  
+          {errors.age && <p className="error-message">{errors.age}</p>}
+          
           <h2>Number of Times Admitted</h2>
-          <div className="input-container">
-            <input
+            <div className="input-container">
+              <input
+                className="input-field"
+                type="number"
+                value={timesAdmitted}
+                onChange={(e) => setTimesAdmitted(e.target.value)}
+                placeholder="Enter times admitted"
+              />
+          </div>
+          {errors.timesAdmitted && <p className="error-message">{errors.timesAdmitted}</p>}
+
+            <h2>Diagnostic Codes</h2>
+            <select 
               className="input-field"
-              type="number"
-              placeholder="Enter times admitted"
-            />
-            <div className="input-buttons">
-              <button>+</button>
-              <button>-</button>
+              value={diagnosticCode}
+              onChange={(e) => setDiagnosticCode(e.target.value)} > 
+              <option value="" disabled selected>
+                Choose codes
+              </option>
+              <option value="code1">J44: COPD & Asthma</option>
+              <option value="code2">J51</option>
+            </select>
+            {errors.diagnosticCode && <p className="error-message">{errors.diagnosticCode}</p>}
+    
+            <button className="predict-btn" onClick={handlePredict}>Predict</button>
+          </div>
+    
+          {/* Chart Section */}
+          <div className="chart-section">
+            <div>
+              <h3>Survival Function of a Single Instance</h3>
+              <div className="chart"></div>
+            </div>
+    
+            <div>
+              <h3>Readmission Function of a Single Instance</h3>
+              <div className="chart"></div>
             </div>
           </div>
-  
-          <h2>Diagnostic Codes</h2>
-          <select className="input-field">
-            <option value="" disabled selected>
-              Choose an option
-            </option>
-            <option value="code1">Code 1</option>
-            <option value="code2">Code 2</option>
-          </select>
-  
-          <button className="predict-btn">Predict</button>
         </div>
-  
-        <div className="chart-section">
-          <h3>Survival function of a single instance</h3>
-          <div className="chart">Chart Placeholder 1</div>
-  
-          <h3>Readmission function of a single instance</h3>
-          <div className="chart">Chart Placeholder 2</div>
         </div>
-      </div>
-    );
-  }
+      );
+    };
   
   export default Dashboard;
