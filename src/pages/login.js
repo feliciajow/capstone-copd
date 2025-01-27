@@ -20,14 +20,14 @@ const Login = ({ handleLogin }) => {
   const handleConfirm = () => {
     setIsModalOpen(true);
   }
-  //submit buttons
+  //submit buttons for login
   const onFinish = (values) => {
     fetch('http://localhost:5000/loggedin', {
       method: 'POST',
       headers: { "Content-Type": "application/json" }, //telling server the type of content that we are sending with this req
       body: JSON.stringify({email: values.email, password: values.password}), //actual content email and password
     })
-    .then((response)=>{ //if status is 409 means there is duplicate value in the columns (email) then error message
+    .then((response)=>{ 
       if (!response.ok){
         return response.json().then((data)=>{
           throw new Error(data.error || 'Login failed');
@@ -50,6 +50,34 @@ const Login = ({ handleLogin }) => {
     })
   };
 
+  //submit buttons for forget pwd
+  const onEmailSubmit = (values) => {
+    fetch('http://localhost:5000/forgetpwd', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" }, //telling server the type of content that we are sending with this req
+      body: JSON.stringify({email: values.email}), //actual content email and password
+    })
+    .then((response)=>{ 
+      if (!response.ok){
+        return response.json().then((data)=>{
+          throw new Error(data.error || 'No email registered.');
+        });
+      }
+      return response.json();
+    })
+    .then(()=>{
+      console.log('Success:', values);
+    })
+    .catch((error)=>{ //handle errors from fetch response
+      setalert(
+        <Alert
+            description={error.message}
+            type="error"
+            showIcon
+      />)
+    })
+  };
+
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
@@ -57,6 +85,7 @@ const Login = ({ handleLogin }) => {
   return (
     <div className="login-container" style={{ padding: "60px" }}>
       {alert}
+      <div className="login-card">
       <Row>
         <h1>Login</h1>
       </Row>
@@ -145,11 +174,12 @@ const Login = ({ handleLogin }) => {
           </Row>
         </Form.Item>
       </Form>
-      <Modal open={isModalOpen} footer={null} closable={false}>
+      </div>
+      <Modal open={isModalOpen} footer={null} onCancel={handleCancel} maskClosable={false}>
         <Result
           title="Forgot Password"
           extra={[
-            <Form>
+            <Form onFinish={onEmailSubmit} onFinishFailed={(errorInfo) => console.log('Failed:', errorInfo)}>
               <Form.Item style={{ textAlign: "left" }}
                 name="email"
                 label="Email"
@@ -170,7 +200,7 @@ const Login = ({ handleLogin }) => {
               </Form.Item>
               <Form.Item>
                 <Button className="forgotpwd-btns" type="default" htmlType="submit">
-                  Next
+                  Send Reset Link
                 </Button>
               </Form.Item>
             </Form>

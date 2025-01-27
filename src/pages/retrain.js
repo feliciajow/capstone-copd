@@ -101,30 +101,33 @@ const Retrain = ({ email }) => {
         //display file upload UI
         <>
             <div className="container">
-                {alert}
-                {!email && (
-                    <Alert
+
+                {email ? (
+                    <>
+                        {alert}
+                        <h1 className='title'>Upload File</h1>
+
+                        <div className="card-container">
+                            <ExcelTemplate />
+                            <br />
+                            <Dragger {...props}>
+                                <p className="ant-upload-drag-icon">
+                                    <CloudUploadOutlined />
+                                </p>
+                                <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                                <p className="ant-upload-hint">
+                                    Support for a single file upload. Supported formats include csv, xls, or xlsx
+                                </p>
+                            </Dragger>
+                            <Button className="btns" style={{ width: '20%', backgroundColor: "#29b6f6" }} type="primary" onClick={uploadModel}>Train Model</Button>
+                        </div>
+                    </>) : (<Alert
                         description="You have to login to your account to train your file."
                         type="info"
                         showIcon
                     />
-                )}
-                <h1 className='title'>Upload File</h1>
 
-                <div className="card-container">
-                    <ExcelTemplate />
-                    <br />
-                    <Dragger {...props}>
-                        <p className="ant-upload-drag-icon">
-                            <CloudUploadOutlined />
-                        </p>
-                        <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                        <p className="ant-upload-hint">
-                            Support for a single file upload. Supported formats include csv, xls, or xlsx
-                        </p>
-                    </Dragger>
-                    <Button className="btns" style={{ width: '20%', backgroundColor: "#29b6f6" }} type="primary" onClick={uploadModel}>Train Model</Button>
-                </div>
+                )}
             </div>
             <Modal open={isModalOpen} footer={null}>
                 <Result
