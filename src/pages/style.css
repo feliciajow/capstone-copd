@@ -8,7 +8,15 @@
 }
 
 .login-container, .signup-container{
-    margin-top:5%
+    /* margin-top:5%; */
+    background: url('/public/wave.svg') no-repeat right center; 
+    background-size: contain, contain;
+    /* background-size: auto 30vh, auto 100vh; */
+    height: 80vh;
+}
+
+.login-card,.signup-card{
+    margin-top:6%;
 }
 
 /* retrain styling */
