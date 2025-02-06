@@ -12,7 +12,10 @@ const Retrain = ({ email }) => {
     const [current, setCurrent] = useState(0);
     //store uploaded excel file
     const [file, setFile] = useState(null);
-
+    const prev = () => {
+        setCurrent(current - 1);
+    };
+    
     const uploadModel = () => {
         if (fileupload) {
             setCurrent(current + 1);
@@ -28,14 +31,18 @@ const Retrain = ({ email }) => {
         }
     };
 
+    const proceed = () => {
+        setCurrent(current + 1);
+    }
+
     const steps = [
         {
             title: 'Upload File',
-            content: <UploadFile alert={setalert} setFile={setFile} fileupload={setfileupload} uploadModel={uploadModel} />, // Use Step1Content
+            content: <UploadFile alert={setalert} setFile={setFile} fileupload={setfileupload} uploadModel={uploadModel} />,
         },
         {
             title: 'Preview file',
-            content:  <PreviewFile file={file} />, 
+            content:  <PreviewFile file={file} proceed={proceed} prev={prev}/>, 
         },
         {
             title: 'Train Model',

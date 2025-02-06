@@ -11,6 +11,11 @@
     margin-top:6%;
 }
 
+.login-left, .signup-left {
+    background: url('../../public/doctors.png') no-repeat;
+    background-size: 95%;
+ }
+
 /* retrain styling */
 .ant-upload-drag {
     background-color: #f9fbfd;
