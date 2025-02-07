@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Col, Row, Pagination, Alert } from 'antd';
-import './style.css';
+import { Table, Alert, Card } from 'antd';
 
 const Models = ({ email }) => {
     const [fetchModel, setfetchModel] = useState([]);
-    //track alert messages error
-    const [alert, setalert] = useState(null)
+    const [loading, setLoading] = useState(false);
+    const [alert, setAlert] = useState(null);
 
     useEffect(() => {
         if (email) {
             fetchModels();
         }
-    }, [email])
+    }, [email]);
 
     const fetchModels = () => {
+        setLoading(true);
         fetch('http://localhost:5000/model', {
             method: 'GET',
-            headers: { "Content-Type": "application/json", "Email": email }, //telling server the type of content that we are sending with this req
+            headers: { "Content-Type": "application/json", "Email": email },
         })
             .then((response) => {
                 if (!response.ok) {
                     return response.json().then((data) => {
-                        throw new Error(data.error || 'Fetch Model Fail.');
+                        throw new Error(data.error || 'Fetch Model Failed');
                     });
                 }
                 return response.json();
@@ -30,38 +30,82 @@ const Models = ({ email }) => {
                 setfetchModel(model);
             })
             .catch((error) => {
-                setalert(
+                setAlert(
                     <Alert
                         description={error.message}
                         type="info"
                         showIcon
+                        className="mb-4"
                     />
-                )
+                );
             })
+            .finally(() => {
+                setLoading(false);
+            });
     };
+
+    const columns = [
+        {
+            title: 'Model ID',
+            dataIndex: 'modelid',
+            key: 'modelid',
+            width: '15%',
+        },
+        {
+            title: 'True Positive',
+            dataIndex: 'true_positive',
+            key: 'true_positive',
+            width: '15%',
+        },
+        {
+            title: 'True Negative',
+            dataIndex: 'true_negative',
+            key: 'true_negative',
+            width: '15%',
+        },
+        {
+            title: 'False Positive',
+            dataIndex: 'false_positive',
+            key: 'false_positive',
+            width: '15%',
+        },
+        {
+            title: 'False Negative',
+            dataIndex: 'false_negative',
+            key: 'false_negative',
+            width: '15%',
+        },
+        {
+            title: 'Created at',
+            dataIndex: 'timestamp',
+            key: 'created_time',
+            width: '25%',
+            render: (text) => new Date(text).toLocaleString(),
+        },
+    ];
+
     return (
-        <>
-            <div className="container">
-                {alert}
-                {!email && (
-                    <Alert
-                        description="You have to login to your account to view models."
-                        type="info"
-                        showIcon
+        <div>
+            <br/>
+            {alert}
+            {!email ? (
+                <Alert description="You have to login to your account to view models." type="info" showIcon/>
+            ) : (
+                <Card style={{background: 'transparent'}}>
+                    <Table
+                        columns={columns}
+                        dataSource={fetchModel}
+                        rowKey="modelid"
+                        loading={loading}
+                        pagination={{
+                            pageSize: 10,
+                            showTotal: (total) => `Total ${total} models`,
+                        }}
                     />
-                )}
-                {fetchModel.map((model) => (
-                    <div key={model.modelid} className="model-card">
-                        <p className="title">Model ID {model.modelid}</p>
-                        <p className="sub-title">True Positive: {model.true_positive}</p>
-                        <p className="sub-title">True Negative: {model.true_negative}</p>
-                        <p className="sub-title">False Positive: {model.false_positive}</p>
-                        <p className="sub-title">False Negative: {model.false_negative}</p>
-                    </div>
-                ))}
-            </div>
-        </>
-    )
-}
+                </Card>
+            )}
+        </div>
+    );
+};
 
 export default Models;
