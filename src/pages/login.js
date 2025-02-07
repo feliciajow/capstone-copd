@@ -25,29 +25,29 @@ const Login = ({ handleLogin }) => {
     fetch('http://localhost:5000/loggedin', {
       method: 'POST',
       headers: { "Content-Type": "application/json" }, //telling server the type of content that we are sending with this req
-      body: JSON.stringify({email: values.email, password: values.password}), //actual content email and password
+      body: JSON.stringify({ email: values.email, password: values.password }), //actual content email and password
     })
-    .then((response)=>{ 
-      if (!response.ok){
-        return response.json().then((data)=>{
-          throw new Error(data.error || 'Login failed');
-        });
-      }
-      return response.json();
-    })
-    .then(()=>{
-      console.log('Success:', values);
-      handleLogin(values.email);
-      navigate('/dashboard', { state: {email: values.email} });
-    })
-    .catch((error)=>{ //handle errors from fetch response
-      setalert(
-        <Alert
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((data) => {
+            throw new Error(data.error || 'Login failed');
+          });
+        }
+        return response.json();
+      })
+      .then(() => {
+        console.log('Success:', values);
+        handleLogin(values.email);
+        navigate('/dashboard', { state: { email: values.email } });
+      })
+      .catch((error) => { //handle errors from fetch response
+        setalert(
+          <Alert
             description={error.message}
             type="error"
             showIcon
-      />)
-    })
+          />)
+      })
   };
 
   //submit buttons for forget pwd
@@ -55,27 +55,27 @@ const Login = ({ handleLogin }) => {
     fetch('http://localhost:5000/forgetpwd', {
       method: 'POST',
       headers: { "Content-Type": "application/json" }, //telling server the type of content that we are sending with this req
-      body: JSON.stringify({email: values.email}), //actual content email and password
+      body: JSON.stringify({ email: values.email }), //actual content email and password
     })
-    .then((response)=>{ 
-      if (!response.ok){
-        return response.json().then((data)=>{
-          throw new Error(data.error || 'No email registered.');
-        });
-      }
-      return response.json();
-    })
-    .then(()=>{
-      console.log('Success:', values);
-    })
-    .catch((error)=>{ //handle errors from fetch response
-      setalert(
-        <Alert
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((data) => {
+            throw new Error(data.error || 'No email registered.');
+          });
+        }
+        return response.json();
+      })
+      .then(() => {
+        console.log('Success:', values);
+      })
+      .catch((error) => { //handle errors from fetch response
+        setalert(
+          <Alert
             description={error.message}
             type="error"
             showIcon
-      />)
-    })
+          />)
+      })
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -86,94 +86,104 @@ const Login = ({ handleLogin }) => {
     <div className="login-container" style={{ padding: "60px" }}>
       {alert}
       <div className="login-card">
-      <Row>
-        <h1>Login</h1>
-      </Row>
-      <br />
-      <Form
-        name="basic"
-        //positioning of input box
-        labelCol={{
-          span: 4,
-        }}
-        //length of input box
-        wrapperCol={{
-          span: 18,
-        }}
-        style={{
-          maxWidth: 600,
-        }}
-        initialValues={{
-          remember: true,
-        }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-        autoComplete="on"
-      >
-        <Form.Item style={{ textAlign: "left" }}
-          name="email"
-          label="Email"
-          labelAlign="left"
-          rules={[
-            {
-              type: 'email',
-              message: 'Please enter a valid email!',
-            },
-            {
-              required: true,
-              message: 'Please input your email!',
-            },
-          ]}
-          hasFeedback
-        >
-          <Input placeholder='Enter your email' />
-        </Form.Item>
+        <Row style={{ height: '65vh' }}>
+          <Col span={1}></Col>
+          <Col span={13}>
+            <Row>
+              <h1>Welcome Back</h1>
+            </Row>
+            <Row>
+              <p style={{ fontSize: "17px" }}>Enter your credentials to continue.</p>
+            </Row>
+            <br />
+            <Form
+              name="basic"
+              //positioning of input box
+              labelCol={{
+                span: 4,
+              }}
+              //length of input box
+              wrapperCol={{
+                span: 18,
+              }}
+              style={{
+                maxWidth: 600,
+              }}
+              initialValues={{
+                remember: true,
+              }}
+              onFinish={onFinish}
+              onFinishFailed={onFinishFailed}
+              autoComplete="on"
+            >
+              <Form.Item style={{ textAlign: "left" }}
+                name="email"
+                label="Email"
+                labelAlign="left"
+                rules={[
+                  {
+                    type: 'email',
+                    message: 'Please enter a valid email!',
+                  },
+                  {
+                    required: true,
+                    message: 'Please input your email!',
+                  },
+                ]}
+                hasFeedback
+              >
+                <Input placeholder='Enter your email' />
+              </Form.Item>
 
-        <Form.Item style={{ textAlign: "left" }}
-          label="Password"
-          labelAlign="left"
-          name="password"
-          rules={[
-            {
-              required: true,
-              message: 'Please input your password!',
-            },
-            {
-              //password minimum 8 characters
-              min: 8 ,
-              message: 'Passwords must be at least 8 characters long.'
-            }
-          ]}
-          hasFeedback
-        >
-          <Input.Password placeholder='Enter your password' />
-        </Form.Item>
+              <Form.Item style={{ textAlign: "left" }}
+                label="Password"
+                labelAlign="left"
+                name="password"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input your password!',
+                  },
+                  {
+                    //password minimum 8 characters
+                    min: 8,
+                    message: 'Passwords must be at least 8 characters long.'
+                  }
+                ]}
+                hasFeedback
+              >
+                <Input.Password placeholder='Enter your password' />
+              </Form.Item>
 
-        <Form.Item label={null}>
-          <Row>
-            <Col span={6}>
-              <Flex justify="space-between" align="left">
-                <a href='#' onClick={openModal}>Forgot password</a>
-              </Flex>
-              <a href='/about'> Continue as guest</a>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24}>
-              <Button className="login-btns" type="primary" style={{ width: "100%", marginTop: "10px", backgroundColor: "#29b6f6" }} htmlType="submit">
-                Login
-              </Button>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24}>
-              <Button className="register-btns" type="default" onClick={() => navigate('/signup')}>
-                Register
-              </Button>
-            </Col>
-          </Row>
-        </Form.Item>
-      </Form>
+              <Form.Item label={null}>
+                <Row>
+                  <Col span={6}>
+                    <Flex justify="space-between" align="left">
+                      <a href='#' onClick={openModal}>Forgot password</a>
+                    </Flex>
+                  </Col>
+                  <Col span={12}></Col>
+                  <Col span={6}>
+                    <a href='/about'> Continue as guest</a>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={24}>
+                    <Button className="login-btns" type="primary" style={{ width: "100%", marginTop: "10px", backgroundColor: "#29b6f6" }} htmlType="submit">
+                      Login
+                    </Button>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={24}>
+                    <p style={{ fontSize: "13px" }}>Don't have an account? <a href='#' onClick={() => navigate('/signup')}> Register</a></p>
+                  </Col>
+                </Row>
+              </Form.Item>
+            </Form>
+          </Col>
+          <Col span={9} className='login-left'></Col>
+        </Row>
       </div>
       <Modal open={isModalOpen} footer={null} onCancel={handleCancel} maskClosable={false}>
         <Result

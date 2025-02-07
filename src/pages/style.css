@@ -7,17 +7,14 @@
     background-color: #29b6f6;
 }
 
-.login-container, .signup-container{
-    /* margin-top:5%; */
-    background: url('/public/wave.svg') no-repeat right center; 
-    background-size: contain, contain;
-    /* background-size: auto 30vh, auto 100vh; */
-    height: 80vh;
-}
-
 .login-card,.signup-card{
     margin-top:6%;
 }
+
+.login-left, .signup-left {
+    background: url('../../public/doctors.png') no-repeat;
+    background-size: 95%;
+ }
 
 /* retrain styling */
 .ant-upload-drag {

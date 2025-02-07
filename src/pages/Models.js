@@ -59,9 +59,6 @@ const Models = ({ email }) => {
                         <p className="sub-title">False Negative: {model.false_negative}</p>
                     </div>
                 ))}
-                <div className="pagination">
-                    <Pagination align="start" defaultCurrent={1} total={50} />
-                </div>
             </div>
         </>
     )
