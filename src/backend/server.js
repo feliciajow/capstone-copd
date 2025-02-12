@@ -102,11 +102,8 @@ app.get("/model", async (req, res) => {
   }
   try {
     const result = await client.query(
-      `Select m.modelid, m.true_positive, m.false_positive, m.true_negative, m.false_negative, m.timestamp 
-      From models m 
-      Inner join users u 
-      On m.userid=u.userid 
-      Where u.email=$1`, [email]
+      `Select m.modelid, m.true_positive, m.false_positive, m.true_negative, m.false_negative, m.timestamp, m.model_data
+      From models m`,
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'No models trained.' });

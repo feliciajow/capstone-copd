@@ -82,6 +82,12 @@ const Models = ({ email }) => {
             width: '25%',
             render: (text) => new Date(text).toLocaleString(),
         },
+        {
+            title: 'Model Data',
+            dataIndex: 'model_data',
+            key: 'model_data',
+            width: '15%',
+        },
     ];
 
     return (
