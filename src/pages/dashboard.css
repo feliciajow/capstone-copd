@@ -98,7 +98,33 @@
     border: 1px solid #ccc;
     color: gray;
   }
-  
+
+  .selected-codes-container {
+    margin-top: 10px;
+  }
+
+  .selected-codes {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .selected-code {
+    background-color: #e3f2fd;
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+  }
+  .selected-code button {
+    margin-left: 8px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: red;
+  }
+
   .predict-btn {
     font-size: 16px; 
     font-weight: bold;
@@ -111,6 +137,7 @@
     height: 50px;
 
   }
+
   
   /* Chart section */
   .chart-section {

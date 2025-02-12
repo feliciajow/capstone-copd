@@ -17,13 +17,13 @@ const client = new Client({
   user: "postgres",
   port: 5432,
   password: "cghrespi",
-  database: "cghdb"
+  database: "postgres"
 })
 client.connect();
 
 app.get("/", (req, res) => {
   res.send("Received!");
-});
+}); 
 
 app.post('/register', async (req, res) => {
   const { email, password } = req.body;
