@@ -19,50 +19,82 @@ const PreviewFile = ({ file, proceed, prev }) => {
     "Secondary Diagnosis Code Concat (Mediclaim)",
     "Discharge Date/Time",
     "Patient ID"
-  ]
-  //credits to https://www.youtube.com/watch?v=yd48ImBhC5U
+  ];
+
   useEffect(() => {
     if (file) {
       const reader = new FileReader();
       reader.readAsArrayBuffer(file);
       reader.onload = (e) => {
-        const data = e.target.result;
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        let parsedData = XLSX.utils.sheet_to_json(sheet, {header: headers, defval:""});
-        console.log(parsedData);
-        //remove duplicated headers
-        parsedData = parsedData.slice(1);
+        try {
+          const data = e.target.result;
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          
+          // headers from the excel file
+          const range = XLSX.utils.decode_range(sheet['!ref']);
+          const actualHeaders = [];
+        
+          for (let C = range.s.c; C <= range.e.c; C++) {
+            const cell = sheet[XLSX.utils.encode_cell({ r: 0, c: C })];
+            actualHeaders.push(cell ? cell.v : undefined);
+          }
 
-        //extract header from file
-        const columnheader = Object.keys(parsedData[0] || {});
-        console.log("Extracted headers:", columnheader);
+          // Clean headers trim whitespace, normalize case
+          const cleanHeaders = actualHeaders.map(header => 
+            header ? header.toString().trim() : ''
+          );
+          
+          // Validate headers
+          const missingHeaders = headers.filter(required => 
+            !cleanHeaders.some(actual => 
+              actual === required
+            )
+          );
 
-        //validate header
-        const checkheader = headers.filter((header) => !columnheader.includes(header));
+          if (missingHeaders.length > 0) {
+            setError(`Missing required columns: ${missingHeaders.join(", ")}. Please fix your file before uploading.`);
+            setLoading(false);
+            return;
+          }
 
-        if (checkheader.length > 0) {
-          setError(`Missing columns ${checkheader.join(", ")}. Please fix it before uploading.`)
+          // If headers are valid, parse data
+          let parsedData = XLSX.utils.sheet_to_json(sheet, {
+            header: headers,
+            defval: "",
+            raw: false
+          });
+
+          // Remove header row
+          parsedData = parsedData.slice(1);
+
+          // Validate data
+          if (parsedData.length === 0) {
+            setError("The file appears to be empty. Please check the content and try again.");
+            setLoading(false);
+            return;
+          }
+
+          // Create columns for the table
+          const parsedColumns = headers.map((header) => ({
+            title: header,
+            dataIndex: header,
+            key: header,
+          }));
+
+          setColumns(parsedColumns);
+          setData(parsedData);
+          setError(null);
+        } catch (err) {
+          setError(`Error processing file: ${err.message}`);
+        } finally {
           setLoading(false);
-          return;
         }
+      };
 
-        if (columnheader.length !== headers.length){
-          setError(`Wrong number of columns. Please fix it before uploading.`)
-          setLoading(false);
-          return;
-        }
-
-        const parsedColumns = headers.map((header) => ({
-          title: header,
-          dataIndex: header,
-          key: header,
-        }));
-
-        setColumns(parsedColumns);
-        setData(parsedData);
-        //stop the loading
+      reader.onerror = () => {
+        setError("Error reading file. Please try again.");
         setLoading(false);
       };
     }
@@ -72,21 +104,35 @@ const PreviewFile = ({ file, proceed, prev }) => {
     <div>
       {error && <Alert message={error} type="error" showIcon />}
       {loading ? (
-        <Spin size="large" style={{ display: 'block', margin: '30px auto' }} />) : (
+        <Spin size="large" style={{ display: 'block', margin: '30px auto' }} />
+      ) : (
         <>
-          <Table
-            columns={columns}
-            dataSource={data}
-            rowKey={(record, id) => id}
-            pagination={{ pageSize: 50 }}
-          />
+          {!error && (
+            <Table
+              columns={columns}
+              dataSource={data}
+              rowKey={(record, id) => id}
+              pagination={{ pageSize: 50 }}
+            />
+          )}
           <br/>
-          <Button className="btns" style={{ width: '20%', margin: '0 8px' }} type="default" onClick={prev}>
+          <Button 
+            className="btns" 
+            style={{ width: '20%', margin: '0 8px' }} 
+            type="default" 
+            onClick={prev}
+          >
             Back
           </Button>
-          {!error && (<Button className="btns" style={{ width: '20%', margin: '0 8px', backgroundColor: '#29b6f6' }} type="primary" onClick={proceed}>
-            Proceed
-          </Button>
+          {!error && (
+            <Button 
+              className="btns" 
+              style={{ width: '20%', margin: '0 8px', backgroundColor: '#29b6f6' }} 
+              type="primary" 
+              onClick={proceed}
+            >
+              Proceed
+            </Button>
           )}
         </>
       )}
