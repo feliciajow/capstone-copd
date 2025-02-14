@@ -11,6 +11,7 @@
     "csv-parser": "^3.2.0",
     "express": "^4.21.2",
     "pg": "^8.13.1",
+    "picklejs": "^0.101.0",
     "python-shell": "^5.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

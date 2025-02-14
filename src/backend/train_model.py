@@ -69,10 +69,10 @@ model_binary = pickle.dumps(rsf)
 
 #Insert model into PostgreSQL
 cur.execute("""
-    INSERT INTO models (userid, true_positive, true_negative, false_positive, false_negative, timestamp, model_data)
-    VALUES (%s, %s, %s, %s, %s, %s, %s)
+    INSERT INTO models (true_positive, true_negative, false_positive, false_negative, timestamp, model_data)
+    VALUES (%s, %s, %s, %s, %s, %s)
     RETURNING modelid;
-""", (userid, true_positive, true_negative, false_positive, false_negative, datetime.now(), model_binary))
+""", (true_positive, true_negative, false_positive, false_negative, datetime.now(), model_binary))
 
 #Retrieve the new modelid
 modelid = cur.fetchone()[0]

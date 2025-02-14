@@ -42,48 +42,36 @@ const Dashboard=() =>{
   };
 
     // Handle form submission
-  const handlePredict = async () => {
-    let validationErrors = {};
+    const handlePredict = async () => {
+      let validationErrors = {};
+      const genderMapped = gender === "female" ? 1 : gender === "male" ? 0 : null;
 
-    // Check if each field is filled
-    if (!gender || gender.trim() === '') validationErrors.gender = '*Gender is required';
-    if (!age || age.trim() === '' || parseInt(age) <= 0) validationErrors.age = '*Age is required and must be greater than 0';
-    if (!timesAdmitted || timesAdmitted.trim() === '' || parseInt(timesAdmitted) <= 0) validationErrors.timesAdmitted = '*Number of times admitted is required and must be greater than 0';
-    if (selectedCodes.length === 0){
-      validationErrors.diagnosticCode = '*At least one diagnostic code is required';
-      console.log("No diagnostic code.")
-    } 
+      if (genderMapped === null) validationErrors.gender = "*Gender is required";
+      if (!age || parseInt(age) <= 0) validationErrors.age = "*Age is required";
+      if (!timesAdmitted || parseInt(timesAdmitted) <= 0) validationErrors.timesAdmitted = "*Number of admissions is required";
+      if (selectedCodes.length === 0) validationErrors.diagnosticCodes = "*At least one diagnostic code is required";
 
-    // Set error messages
-    setErrors(validationErrors);
+      setErrors(validationErrors);
+      if (Object.keys(validationErrors).length > 0) return;
 
-    // Check if there are validation errors
-    if (Object.keys(validationErrors).length > 0) {
-        console.log("❌ Validation failed", validationErrors);
-        alert("Please fill in all required fields correctly.");
-        return;
-    }
+      try {
+          const response = await axios.post("http://localhost:5001/predict", {
+              gender: genderMapped,
+              age: parseInt(age),
+              readmissions: parseInt(timesAdmitted),
+              diagnosticCodes: selectedCodes
+          });
 
-    // If all fields are filled, proceed with prediction
-    try {
-        const response = await axios.post("http://localhost:5001/predict", {
-            gender: gender.trim(),
-            age: parseInt(age),  // Ensure age is a number
-            readmissions: parseInt(timesAdmitted), // Ensure times admitted is a number
-            diagnosticCodes: selectedCodes, // Send the selected codes
-        });
-
-        setPrediction(response.data.prediction);
-    } catch (error) {
-        console.error("Prediction failed:", error);
-        console.log("Request data was:", error.config.data);
-        alert(error.response?.data?.error || "Error making prediction");
-    }
-};
+          setPrediction(response.data);
+      } catch (error) {
+          alert(error.response?.data?.error || "Error making prediction");
+      }
+    };
     
     const handleCollection = () => {
       navigate('/collection');
     };
+    
 
     return (
           <div className="dashboard-container">
@@ -93,11 +81,11 @@ const Dashboard=() =>{
             <div className="metric-cards">
             <div className="probability">
               <h3>6 month</h3>
-              <p>{prediction ? prediction.survival_6_month.toFixed(3) : "N/A"}</p>
+              <p>6-month: {prediction?.survival_6_month ? `${(prediction.survival_6_month * 100).toFixed(1)}%` : "N/A"}</p>
             </div>
             <div className="probability">
               <h3>12 month</h3>
-              <p>{prediction ? prediction.survival_12_month.toFixed(3) : "N/A"}</p>
+              <p>12-month: {prediction?.survival_12_month ? `${(prediction.survival_12_month * 100).toFixed(1)}%` : "N/A"}</p>
             </div>
           </div>
           </div>
@@ -107,11 +95,11 @@ const Dashboard=() =>{
           <div className="metric-cards">
           <div className="probability">
             <h3>1 year</h3>
-            <p>{prediction ? prediction.readmission_1_year.toFixed(3) : "N/A"}</p>
+            <p>{prediction?.readmission_1_year !== undefined ? prediction.readmission_1_year.toFixed(3) : "N/A"}</p>
           </div>
           <div className="probability">
             <h3>5 year</h3>
-            <p>{prediction ? prediction.readmission_5_year.toFixed(3) : "N/A"}</p>
+            <p>{prediction?.readmission_5_year !== undefined ? prediction.readmission_5_year.toFixed(3) : "N/A"}</p>
             </div>
           </div>
         </div>
@@ -178,9 +166,6 @@ const Dashboard=() =>{
                     ))}
                 </div>
 
-            
-      
-    
             <button className="predict-btn" onClick={handlePredict}>Predict</button>
           </div>
     
