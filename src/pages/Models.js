@@ -140,6 +140,12 @@ const Models = ({ email }) => {
                 );
             },
         },
+        {
+            title: 'Model Data',
+            dataIndex: 'model_data',
+            key: 'model_data',
+            width: '15%',
+        },
     ];
 
     return (

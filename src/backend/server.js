@@ -102,6 +102,7 @@ app.get("/model", async (req, res) => {
   }
   try {
     const result = await client.query(
+
       `Select m.modelid, m.true_positive, m.false_positive, m.true_negative, m.false_negative, m.timestamp 
       From models m`
     );
