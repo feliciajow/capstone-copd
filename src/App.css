@@ -55,9 +55,14 @@ body{
 .navbar-left {
   display: flex;
   align-items: center;
+  height: 100%;
 }
 
 .navbar-title {
+  height: 40px; /* Set a fixed height */
+  width: auto; /* Maintain aspect ratio */
+  object-fit: contain; /* Ensure the image fits within the dimensions while maintaining aspect ratio */
+  cursor: pointer;
   font-size: 18px;
   font-weight: bold;
   color: #333333;
@@ -104,4 +109,3 @@ body{
   cursor: pointer;
   transition: background 0.3s ease;
 }
-
