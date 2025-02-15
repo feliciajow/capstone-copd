@@ -8,7 +8,7 @@ from datetime import datetime
 
 # Connect to database 
 conn = psycopg2.connect(
-    database="postgres",
+    database="cghdb",
     user="postgres",
     password="cghrespi",
     host="localhost",
@@ -38,7 +38,8 @@ diagnostic_codes = [col for col in df.columns if col not in exclude_columns]
 X = df.drop(columns=["Dead", "Survival Duration (Days)"])
 
 #Save the diagnostic codes in database 
-cur.execute("DELETE FROM diagnostic_codes")  # Clearing existing codes to avoid duplicates
+# Clearing existing codes to avoid duplicates
+cur.execute("DELETE FROM diagnostic_codes")
 for code in diagnostic_codes:
     cur.execute("INSERT INTO diagnostic_codes (code_name) VALUES (%s) ON CONFLICT DO NOTHING;", (code,))
 conn.commit()

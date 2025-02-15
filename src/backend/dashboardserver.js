@@ -3,7 +3,8 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const { Pool } = require("pg");
 const { PythonShell } = require("python-shell");
-
+const fs = require('fs').promises;
+const path = require('path');
 
 const app = express();
 app.use(cors());
@@ -13,10 +14,14 @@ app.use(bodyParser.json());
 const pool = new Pool({
     user: "postgres",
     host: "localhost",
-    database: "postgres",
+    database: "cghdb",
     password: "cghrespi",
     port: 5432,
 });
+
+// A temp folder is created and check if it exists
+const tempDir = path.join(__dirname, 'temp');
+fs.mkdir(tempDir, { recursive: true }).catch(console.error);
 
 // Function to fetch diagnostic codes
 async function getDiagnosticCodes() {
@@ -39,8 +44,8 @@ app.get("/diagnostic-codes", async (req, res) => {
     }
 });
 
-// Retrieve latest trained model
-async function getLatestModel() {
+// Retrieve/Get model
+async function getModel() {
     try {
         const result = await pool.query(
             "SELECT modelid, model_data FROM models ORDER BY timestamp DESC LIMIT 1"
@@ -52,19 +57,16 @@ async function getLatestModel() {
                 model_data: result.rows[0].model_data,
             };
         } else {
-            console.log("⚠️ No model found in PostgreSQL");
             return null;
         }
     } catch (error) {
-        console.error("❌ Error retrieving model from PostgreSQL:", error);
         return null;
     }
 }
 
-// Predict API
+// predict
 app.post("/predict", async (req, res) => {
     const { gender, age, readmissions, diagnosticCodes } = req.body;
-    console.log("📥 Received Request Data:", { gender, age, readmissions, diagnosticCodes });
 
     if (gender === null || age === null || readmissions === null || diagnosticCodes.length === 0) {
         return res.status(400).json({ error: "All input fields are required" });
@@ -73,7 +75,7 @@ app.post("/predict", async (req, res) => {
         // Fetch all possible diagnostic codes
         const allDiagnosticCodes = await getDiagnosticCodes();
 
-        // Initialize all diagnostic codes to 0
+        // Initialize diagnostic codes to 0
         let diagnosticInput = {};
         allDiagnosticCodes.forEach(code => diagnosticInput[code] = 0);
 
@@ -87,65 +89,46 @@ app.post("/predict", async (req, res) => {
         console.log("Diagnostic Code Mappings:", diagnosticInput);
 
         // Get latest model
-        const modelData = await getLatestModel();
+        const modelData = await getModel();
         if (!modelData) {
             return res.status(404).json({ error: "No trained models found." });
         }
 
+        // Write model data to temp file
+        const tempModelPath = path.join(tempDir, `model_${Date.now()}.pkl`);
+        await fs.writeFile(tempModelPath, modelData.model_data);
+
         const formattedCodes = Object.values(diagnosticInput).join(",");
-        console.log("🔍 Calling Python script with:", [modelData.model_data, gender, age, readmissions, formattedCodes]);
 
         // Call Python script for prediction
         let options = {
             mode: "json",
-            pythonOptions: ["-u"],
-            args: [modelData.model_data, gender, age, readmissions, formattedCodes]
+            pythonOptions: ["-u"], 
+            pythonPath: "python",   
+            args: [tempModelPath, gender, age, readmissions, formattedCodes],
+            stderrParser: true
         };
 
-        PythonShell.run("predict.py", options, (err, results) => {
-            if (err) {
-                console.error("❌ Python error:", err);
-                return res.status(500).json({ error: "Prediction failed" });
-            }
-            console.log("✅ Prediction Result:", results);
-            res.json({ prediction: results[0] });
-        });
+        PythonShell.run("predict.py", options)
+            .then(async (results) => {
+                // Clean up temp file
+                await fs.unlink(tempModelPath).catch(console.error);
+
+                if (results && results.length > 0) {
+                    res.json(results[0]);  
+                } else {
+                    res.status(500).json({ error: "No prediction results" });
+                }
+            })
+            .catch(async (err) => {
+                await fs.unlink(tempModelPath).catch(console.error);
+                res.status(500).json({ error: "Prediction failed: " + err.message });
+            });
 
     } catch (error) {
-        console.error("❌ Server Error:", error);
         res.status(500).json({ error: "An error occurred while making predictions." });
     }
 });
 
 const PORT = 5001;
 app.listen(PORT, () => console.log(`DASHBOARD running on http://localhost:${PORT}`));
-
-
-
-// //Training model for logged-in user
-// app.post("/train", async (req, res) => {
-//     const { email } = req.body;
-//     if (!email) {
-//         return res.status(400).json({ error: "Email is required" });
-//     }
-
-//     try {
-//         // Get userid from email
-//         const userResult = await pool.query("SELECT userid FROM users WHERE email = $1", [email]);
-//         if (userResult.rows.length === 0) {
-//             return res.status(404).json({ error: "User not found" });
-//         }
-//         const userid = userResult.rows[0].userid;
-
-//         PythonShell.run("train_model.py", null, (err, results) => {
-//             if (err) {
-//                 console.error(err);
-//                 return res.status(500).json({ error: "Model training failed" });
-//             }
-//             res.json({ message: "Model trained successfully!" });
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: "An error occurred" });
-//     }
-// });
